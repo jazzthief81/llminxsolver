@@ -110,6 +110,6 @@ Here are some improvements that I have in mind for future versions:
 - Have the ability to ignore the position and orientation of any individual piece and not just of all corners or all edges.
 - Before building a set of pruning tables, inform the user of the required disk space and the estimated time for generating them and let the user confirm.
 - Allow smaller and/or less pruning tables so that the application remains usable (but slower) on machines with less memory.
-- Allow bigger pruning tables that will make the search even faster om machines with more memory.
+- Allow bigger pruning tables that will make the search even faster on machines with more memory.
 - Add center pieces to the diagram so that you can see more clearly which pieces belongs where.
 - Add an option to show arrows on the diagram so that you can see the cycles.
