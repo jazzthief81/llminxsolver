@@ -6,6 +6,7 @@ Last layer megaminx solver is an application that allows you to search for algor
 
 The solver runs on any platform that supports Java and requires at least 512 MB of RAM.
 
+![Last layer megaminx solver v1.0](https://github.com/jazzthief81/llminxsolver/raw/master/docs/images/llminxsolver_ui.png "Last layer megaminx solver v1.0")  
 [Download last layer megaminx solver v1.0](https://github.com/jazzthief81/llminxsolver/releases/download/v1.0/llminxsolver-1.0.jar)
 
 The download is an executable JAR file and can be launched by double-clicking on it, assuming that a Java Runtime Environment is installed on the system.
@@ -17,6 +18,11 @@ The download is an executable JAR file and can be launched by double-clicking on
 Setting up the case that you want to solve can be done by dragging and dropping the pieces on the diagram that you see in the top-left pane.
 
 Swapping two corners can be done by clicking one corner and dragging it to the other corner that you want to swap it with. An arrow indicates which pieces are being swapped while you’re dragging. Similarly two edges can be swapped by clicking one edge and dragging it to the other edge that you want to swap it with.
+
+![Swapping corners](https://github.com/jazzthief81/llminxsolver/raw/master/docs/images/swap_corners.png "Swapping corners")
+![Swapping edges](https://github.com/jazzthief81/llminxsolver/raw/master/docs/images/swap_edges.png "Swapping edges")
+![Twisting corners](https://github.com/jazzthief81/llminxsolver/raw/master/docs/images/twist_corners.png "Twisting corners")
+![Flipping edges](https://github.com/jazzthief81/llminxsolver/raw/master/docs/images/flip_edges.png "Flipping edges")
 
 Changing the orientation of a piece can also be done with drag and drop gestures. Simply click on a sticker of a piece - corner or edge - and drag it to another sticker of the same piece that you want to move it to. The stickers of the piece will be cycled in the direction of the arrow that appears while you’re dragging.
 
@@ -34,6 +40,8 @@ The search is optimized for finding solutions
 
 You have to select one of those 5 modes from the **Allowed faces** panel.
 
+![Allowed faces](https://github.com/jazzthief81/llminxsolver/raw/master/docs/images/allowed_faces.png "Allowed faces")
+
 For each of the 5 options, the solver will decide on a heuristic that speeds up the search as much as possible within the current memory restrictions.
 
 ### Selecting the metric
@@ -43,6 +51,8 @@ The solver can be set up to use one of two metrics to determine the length of an
 In **face turn metric** each turn of a face counts as one move, whether it be a fifth turn (72°) or a double fifth turn (144°).
 
 In **fifth turn metric** each fifth turn of a face counts as one move. Turning a face two fifths (144°) now counts as two moves.
+
+![Metrics](https://github.com/jazzthief81/llminxsolver/raw/master/docs/images/metrics.png "Metrics")
 
 You will find that searching in fifth turn metric will return more ergonomic algorithms, while searching in face turn metric will often yield awkward solutions that have almost nothing but double fifth turns in them.
 
@@ -57,6 +67,11 @@ You can choose to
 
 Any of the four settings can be toggled on and off independently and all combinations are supported by the solver. The diagram on the top-left will reflect these settings by greying out the stickers that are ignored when ignoring the position of corners or edges. When ignoring the orientation, a checkerboard pattern will indicate that a sticker can have any of two or three colors.
 
+![Solve only edge orientation](https://github.com/jazzthief81/llminxsolver/raw/master/docs/images/solve_edge_orientation.png "Solve only edge orientation")
+![Solve only orientation](https://github.com/jazzthief81/llminxsolver/raw/master/docs/images/solve_orientation.png "Solve only orientation")
+![Ignore edge position](https://github.com/jazzthief81/llminxsolver/raw/master/docs/images/ignore_edge_position.png "Ignore edge position")
+![Ignore corner orientation](https://github.com/jazzthief81/llminxsolver/raw/master/docs/images/ignore_corner_orientation.png "Ignore corner orientation")
+
 ### Starting the search
 
 To start the search, click the **Solve** button.
@@ -66,6 +81,8 @@ The solver will try to find solutions of increasing length: it will start by sea
 All found solutions are formatted and printed in the box in the bottom portion of the window. The length in face turn metric and fifth turn metric are put next to the algorithm in between brackets.
 
 Algorithms can be selected and then copied and pasted using the standard hotkeys CTRL-C and CTRL-V (or cmd-C and cmd-V on the Mac). If you want to check the algorithms while the search is running, you can disable the **Follow messages** checkbox. This will prevent the output box from scrolling down each time a new solution is found so that you can read the output at your own pace.
+
+![Solutions](https://github.com/jazzthief81/llminxsolver/raw/master/docs/images/solutions.png "Solutions")
 
 If, however, you want to see all new solutions as they’re found you can re-enable the **Follow messages** checkbox again.
 
