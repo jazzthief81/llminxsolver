@@ -96,6 +96,7 @@ This table shows the required disk space and gives you an idea of how much time 
 | R, U, F       | 10 minutes        | 268 MB     |
 | R, U, F, L    | 15 minutes        | 228 MB     |
 | R, U, F, L, B | 50 minutes        | 317 MB     |
+
 <small>*These times were measured on an Intel® Core™2 Duo T7700 running at 2.4 Ghz.</small>
 
 Keep in mind that these tables need to be generated twice: once for fifth turn metric and once for face turn metric. The total disk space required for storing all pruning tables is **1.7 GB**.
