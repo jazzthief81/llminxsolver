@@ -603,6 +603,7 @@ public class LLMinxSolver {
     byte last_move = aMinx.getLastMove();
     byte next_sibling = next_siblings[last_move + 1][sibling];
     while ( last_move != -1 && next_sibling == -1 ) {
+      if ( aMinx.getDepth() == 1 ) return true;
       sibling = aMinx.undoMove();
       last_move = aMinx.getLastMove();
       next_sibling = next_siblings[last_move + 1][sibling];
