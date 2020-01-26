@@ -410,7 +410,7 @@ public class LLMinxSolverMainWindow extends JFrame implements StatusListener {
     }
 
     public void actionPerformed(ActionEvent actionEvent) {
-      fMinxSolver.interupt();
+      fMinxSolver.interrupt();
       fSolveCancelButton.setEnabled(false);
     }
 

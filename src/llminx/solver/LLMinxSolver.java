@@ -5,10 +5,11 @@ import llminx.solver.searchmode.LLMinxMetric;
 import llminx.solver.searchmode.LLMinxPruner;
 import llminx.solver.searchmode.LLMinxSearchMode;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Vector;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  *
@@ -214,65 +215,85 @@ public class LLMinxSolver {
       fSearchStarted = true;
       fireEvent( new StatusEvent( StatusEventType.MESSAGE, "Searching...", 0 ) );
       LLMinx.setKeepMoves( true );
-      int i;
-      int levels_left;
       boolean stop;
       LLMinx goal = new LLMinx();
+      ExecutorService executor = Executors.newFixedThreadPool(10);
       for ( fDepth = 1; ( !fLimitDepth || fDepth <= fMaxDepth ) && fDepth < pruned.length && !fInterupted; fDepth++ ) {
         Arrays.fill( pruned, 0 );
         fNodes = 0;
         fireEvent( new StatusEvent( StatusEventType.START_DEPTH, "Searching depth " + fDepth + "...", 0 ) );
         LLMinx minx = fStart.clone();
-        stop = false;
-        while ( !stop && !fInterupted ) {
-          fNodes++;
-          levels_left = fDepth - minx.getDepth();
-          if ( minx.equals( goal ) ) {
-            if ( levels_left == 0 && checkOptimal( minx ) ) {
-              String msg = minx.getGeneratingMoves() + " (" + minx.getHTMLength() + "," + minx.getQTMLength() + ")";
-              fireEvent( new StatusEvent( StatusEventType.MESSAGE, msg, 0 )
-              );
-            }
-            if ( levels_left > 0 ) {
-              pruned[levels_left - 1]++;
-            }
-            stop = backTrack( minx );
-          }
-          else {
-            if ( levels_left > 0 ) {
-              for ( i = 0; i < fUsedPruners.length; i++ ) {
-                LLMinxPruner pruner = fUsedPruners[i];
-                if ( fUsedTables[i][pruner.getCoordinate( minx )] > levels_left ) {
-                  pruned[levels_left - 1]++;
-                  break;
-                }
-              }
-              // add children.
-              if ( i == fUsedPruners.length ) {
-                stop = nextNode( minx );
-              }
-              else {
-                stop = backTrack( minx );
-              }
-            }
-            else {
-              stop = nextNode( minx );
-            }
+        nextNode(minx);
+        List<Future<Boolean>> list = new ArrayList<Future<Boolean>>();
+        do {
+          LLMinx clone = minx.clone();
+          list.add(executor.submit(()->solveParallel(clone, goal)));
+          stop = nextParallel(minx);
+        } while (!stop);
+        for(Future<Boolean> fut : list){
+          try {
+            //print the return value of Future, notice the output delay in console
+            // because Future.get() waits for task to get completed
+            System.out.println(new Date()+ "::"+fut.get());
+          } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
           }
         }
         fireEvent( new StatusEvent( StatusEventType.END_DEPTH, "Searching depth " + fDepth + "...", 1 ) );
       }
     }
 
-    boolean interupted = fInterupted;
+    boolean interrupted = fInterupted;
     fInterupted = false;
-    String msg = ( interupted ? "Search interrupted after " : "Search completed in " )
+    String msg = ( interrupted ? "Search interrupted after " : "Search completed in " )
         + ( int ) ( ( System.currentTimeMillis() - time ) / 1000 ) + " seconds.";
     fireEvent( new StatusEvent( StatusEventType.MESSAGE, msg, 1 ) );
-    return interupted;
+    return interrupted;
   }
 
-  public void interupt() {
+  public boolean solveParallel(LLMinx minx, LLMinx goal) {
+    boolean stop = false;
+    while ( !stop && !fInterupted ) {
+      fNodes++;
+      int levels_left = fDepth - minx.getDepth();
+      if ( minx.equals( goal ) ) {
+        if ( levels_left == 0 && checkOptimal( minx ) ) {
+          String msg = minx.getGeneratingMoves() + " (" + minx.getHTMLength() + "," + minx.getQTMLength() + ")";
+          fireEvent( new StatusEvent( StatusEventType.MESSAGE, msg, 0 )
+          );
+        }
+        if ( levels_left > 0 ) {
+          pruned[levels_left - 1]++;
+        }
+        stop = backTrack( minx );
+      }
+      else {
+        if ( levels_left > 0 ) {
+          int i;
+          for ( i = 0; i < fUsedPruners.length; i++ ) {
+            LLMinxPruner pruner = fUsedPruners[i];
+            if ( fUsedTables[i][pruner.getCoordinate( minx )] > levels_left ) {
+              pruned[levels_left - 1]++;
+              break;
+            }
+          }
+          // add children.
+          if ( i == fUsedPruners.length ) {
+            stop = nextNode( minx );
+          }
+          else {
+            stop = backTrack( minx );
+          }
+        }
+        else {
+          stop = nextNode( minx );
+        }
+      }
+    }
+    return stop;
+  }
+
+  public void interrupt() {
     fInterupted = true;
   }
 
@@ -577,7 +598,7 @@ public class LLMinxSolver {
   }
 
   private boolean backTrack( LLMinx aMinx ) {
-    if ( aMinx.getDepth() == 0 ) return true;
+    if ( aMinx.getDepth() == 1 ) return true;
     byte sibling = aMinx.undoMove();
     byte last_move = aMinx.getLastMove();
     byte next_sibling = next_siblings[last_move + 1][sibling];
@@ -593,7 +614,18 @@ public class LLMinxSolver {
       aMinx.move( next_sibling );
       return false;
     }
+  }
 
+  private boolean nextParallel(LLMinx aMinx ) {
+    byte sibling = aMinx.undoMove();
+    byte next_sibling = next_siblings[0][sibling];
+    if ( next_sibling == -1 ) {
+      return true;
+    }
+    else {
+      aMinx.move( next_sibling );
+      return false;
+    }
   }
 
   public void addStatusListener( StatusListener aListener ) {
@@ -604,7 +636,7 @@ public class LLMinxSolver {
     fEventListeners.remove( aListener );
   }
 
-  private void fireEvent( StatusEvent aStatusEvent ) {
+  synchronized private void fireEvent( StatusEvent aStatusEvent ) {
     Iterator<StatusListener> listeners = fEventListeners.iterator();
     while ( listeners.hasNext() ) {
       StatusListener listener = listeners.next();
