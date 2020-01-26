@@ -225,17 +225,15 @@ public class LLMinxSolver {
         fireEvent( new StatusEvent( StatusEventType.START_DEPTH, "Searching depth " + fDepth + "...", 0 ) );
         LLMinx minx = fStart.clone();
         nextNode(minx);
-        List<Future<Boolean>> list = new ArrayList<Future<Boolean>>();
+        List<Future<Boolean>> solverFutures = new ArrayList<Future<Boolean>>();
         do {
           LLMinx clone = minx.clone();
           list.add(executor.submit(()->solveParallel(clone, goal)));
           stop = nextParallel(minx);
         } while (!stop);
-        for(Future<Boolean> fut : list){
+        for(Future<Boolean> future : solverFutures){
           try {
-            //print the return value of Future, notice the output delay in console
-            // because Future.get() waits for task to get completed
-            System.out.println(new Date()+ "::"+fut.get());
+            future.get());
           } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
           }
