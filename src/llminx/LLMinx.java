@@ -183,6 +183,12 @@ public class LLMinx implements Comparable<LLMinx> {
     fIgnoreEdgeOrientations = aIgnoreEdgeOrientations;
     fMoves = aMoves;
     fDepth = aDepth;
+    if (fDepth > 0) {
+      fLastMove = fMoves[fDepth - 1];
+    }
+    else {
+      fLastMove = -1;
+    }
   }
 
   public static int getMaxDepth() {
